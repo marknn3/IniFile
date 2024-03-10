@@ -70,8 +70,9 @@ namespace IniFile
 
             string eot = string.IsNullOrEmpty(MultiLineEndOfText) || MultiLineEndOfText.Trim().Length == 0
                 ? "EOT" : MultiLineEndOfText.Trim();
+            string eotPrefix = (eot == "\"\"\"") ? "" : "<<";
             var sb = new StringBuilder();
-            sb.AppendLine($"{Padding.Left}{Name}{Padding.InsideLeft}={Padding.InsideRight}<<{eot}");
+            sb.AppendLine($"{Padding.Left}{Name}{Padding.InsideLeft}={Padding.InsideRight}{eotPrefix}{eot}");
             foreach (string line in lines)
                 sb.AppendLine(line);
             sb.AppendLine(eot);

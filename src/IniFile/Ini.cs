@@ -232,7 +232,7 @@ namespace IniFile
 #else
                             mlValue.Clear();
 #endif
-                            mlEot = match.Groups[1].Value;
+                            mlEot = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value;
                         }
                     }
 
@@ -241,7 +241,7 @@ namespace IniFile
             }
         }
 
-        private static readonly Regex MultilineStartPattern = new(@"^<<(\w+)$");
+        private static readonly Regex MultilineStartPattern = new(@"^(?:<<(\w+))|(?:^(""""""))$");
 
         /// <summary>
         ///     Go through each line object and construct a hierarchical object model, with properties
