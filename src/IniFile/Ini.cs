@@ -266,7 +266,21 @@ namespace IniFile
                     case Section section:
                         currentSection = section;
                         AddRangeAndClear(currentSection.Items, minorItems);
-                        Add(currentSection);
+                        if (Config.SectionCollection.Allow)
+                        {
+                            Section existingSection = this[currentSection.Name];
+                            if (existingSection == null)
+                            {
+                                Add(currentSection);
+                                existingSection = currentSection;
+                            }
+                            existingSection.Collection ??= new List<Section>();
+                            existingSection.Collection.Add(currentSection);
+                        }
+                        else
+                        {
+                            Add(currentSection);
+                        }
                         break;
                     case Property property when currentSection is null:
                         throw new FormatException(string.Format(CultureInfo.CurrentCulture, ErrorMessages.PropertyWithoutSection, property.Name));
@@ -365,19 +379,34 @@ namespace IniFile
         {
             foreach (Section section in this)
             {
-                foreach (MinorIniItem minorItem in section.Items)
-                    writer.WriteLine(minorItem.ToString());
-                writer.WriteLine(section.ToString());
-                foreach (Property property in section)
+                if (section.Collection != null)
                 {
-                    foreach (MinorIniItem minorItem in property.Items)
-                        writer.WriteLine(minorItem.ToString());
-                    writer.WriteLine(property.ToString());
+                    foreach (Section subSection in section.Collection)
+                    {
+                        InternalSaveSection(writer, subSection);
+                    }
+                }
+                else
+                {
+                    InternalSaveSection(writer, section);
                 }
             }
 
             foreach (MinorIniItem trailingItem in TrailingItems)
                 writer.WriteLine(trailingItem.ToString());
+        }
+
+        private void InternalSaveSection(TextWriter writer, Section section)
+        {
+            foreach (MinorIniItem minorItem in section.Items)
+                writer.WriteLine(minorItem.ToString());
+            writer.WriteLine(section.ToString());
+            foreach (Property property in section)
+            {
+                foreach (MinorIniItem minorItem in property.Items)
+                    writer.WriteLine(minorItem.ToString());
+                writer.WriteLine(property.ToString());
+            }
         }
 
 #if NETSTANDARD
@@ -432,20 +461,36 @@ namespace IniFile
         {
             foreach (Section section in this)
             {
-                foreach (MinorIniItem minorItem in section.Items)
-                    await writer.WriteLineAsync(minorItem.ToString()).ConfigureAwait(false);
-                await writer.WriteLineAsync(section.ToString()).ConfigureAwait(false);
-                foreach (Property property in section)
+                if (section.Collection != null)
                 {
-                    foreach (MinorIniItem minorItem in property.Items)
-                        await writer.WriteLineAsync(minorItem.ToString()).ConfigureAwait(false);
-                    await writer.WriteLineAsync(property.ToString()).ConfigureAwait(false);
+                    foreach (Section subSection in section.Collection)
+                    {
+                        await InternalSaveSectionAsync(writer, subSection);
+                    }
+                }
+                else
+                {
+                    await InternalSaveSectionAsync(writer, section);
                 }
             }
 
             foreach (MinorIniItem trailingItem in TrailingItems)
                 await writer.WriteLineAsync(trailingItem.ToString()).ConfigureAwait(false);
         }
+
+        private async Task InternalSaveSectionAsync(TextWriter writer, Section section)
+        {
+            foreach (MinorIniItem minorItem in section.Items)
+                await writer.WriteLineAsync(minorItem.ToString()).ConfigureAwait(false);
+            await writer.WriteLineAsync(section.ToString()).ConfigureAwait(false);
+            foreach (Property property in section)
+            {
+                foreach (MinorIniItem minorItem in property.Items)
+                    await writer.WriteLineAsync(minorItem.ToString()).ConfigureAwait(false);
+                await writer.WriteLineAsync(property.ToString()).ConfigureAwait(false);
+            }
+        }
+
 #endif
 
         /// <summary>

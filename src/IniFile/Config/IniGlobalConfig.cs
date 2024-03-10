@@ -46,6 +46,24 @@ namespace IniFile.Config
         public TypesConfig Types { get; } = new TypesConfig();
 
         /// <summary>
+        ///     Configuration for heldling duplicate Section names as Collections.
+        /// </summary>
+        public SectionCollectionConfig SectionCollection { get; } = new SectionCollectionConfig();
+
+        /// <summary>
+        ///     Allows duplicate Section names as Collection
+        /// </summary>
+        /// <param name="allow">Allows duplicate Section names as Collection.</param>
+        /// <returns>
+        ///     The same <see cref="IniGlobalConfig"/> instance so that multiple calls can be chained.
+        /// </returns>
+        public IniGlobalConfig AllowSectionCollection(bool allow = true)
+        {
+            SectionCollection.Allow = allow;
+            return this;
+        }
+
+        /// <summary>
         ///     Allows the hash symbol (#) to be used to prefix comments.
         /// </summary>
         /// <param name="setAsDefault">Sets the default comment prefix to the hash symbol (#).</param>

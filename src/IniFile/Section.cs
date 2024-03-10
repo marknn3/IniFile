@@ -51,6 +51,12 @@ namespace IniFile
         /// </summary>
         public SectionPadding Padding { get; } = new();
 
+        /// <summary>
+        ///     Collection of Sections with the same name<see cref="Section"/>.
+        /// </summary>
+        public IList<Section> Collection { get; set; } = null;
+
+
         /// <inheritdoc/>
         public override string ToString()
         {
