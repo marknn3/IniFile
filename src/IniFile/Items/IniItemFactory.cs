@@ -91,9 +91,9 @@ namespace IniFile.Items
             return comment;
         }
 
-        private static readonly Regex CommentPattern = new Regex(@"^(\s*)(;)(\s*)(.+)(\s*)$");
+        private static readonly Regex CommentPattern = new Regex(@"^(\s*)(;)(\s*)(.*)(\s*)$");
 
-        private static readonly Regex CommentWithHashPattern = new Regex(@"^(\s*)([;|#])(\s*)(.+)(\s*)$");
+        private static readonly Regex CommentWithHashPattern = new Regex(@"^(\s*)([;|#])(\s*)(.*)(\s*)$");
 
         private static IniItem TryCreateBlankLine(string line)
         {
